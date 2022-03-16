@@ -1,0 +1,141 @@
+// Mars 2022 avec Proccessing        2D tracés vers 3D relief
+// Objectif, suivre une ligne avec des mouvement circulaire et garder le sens de la direction, decalage 5°
+// Ne fonctionne pas degree--, il faut une condition si < > degree precedent et inverssé les conditions des fonctions
+int petit = 0;
+  int grand = 0;
+  int moyenne = 0;
+  int valPetit =0;
+  int valGrand = 0;
+
+int X1, X2, Y1, Y2 = 0;
+float angle = 0;
+float angle2 =180;
+int d = 0;
+//            !!!!!    LA RECHERCHE ETAIT polué par le bord de la fenetre rect -500, -500
+int Xo = 0;
+int Yo = 0;
+// dans le cas d'une autre facon ou l'intialisation de la variable angle est changé et que SEUIL le soit aussi
+// IF angle opposé sera decalé si l'angle trouvé
+int Nord = 0;  // soit 359 + 1  y pensé
+int NordEst = 45;
+int Est = 90;
+int EstSud = 135;
+int Sud = 180;
+int SudOuest = 225;
+int Ouest = 270;
+int OuestNord = 315;
+int NordInverse = 360;
+int[] directionVi = {0,45,90,135,180,225,270,315,360};
+int[] directionVa = {180,225,270,315,0,45,90,135,180};
+String[] direcTexte = {"Sud", "Sud/Est", "Est", "Est/Nord","Nord", "Nord/Ouest","Ouest","Ouest/Sud","SudP"};
+String[] direcTexte2 = {"Nord", "Nord/Ouest","Ouest","Ouest/Sud","Sud", "Sud/Est", "Est", "Est/Nord","SudP"};
+//dist(); est une fonction mais est elle presente sur arduino, math ou autre?
+//prendre la moyenne comme l'etalonnage!!!!
+
+//plus proche
+//2e plus proche
+int premier = 0;
+int deusieme = 0;
+int maVal = int(angle);
+
+
+//          /////////////        setupe            /////////////   ++++++++++++++++++++++++++++++++++++++++
+void setup() {
+  
+    fullScreen(P2D);
+    
+
+ 
+ }
+
+//          /////////////         draw           /////////////   ++++++++++++++++++++++++++++++++++++++++
+void draw(){ 
+  background(240, 240, 240);
+  //for(int a = 0; a <= 360; a++){
+    if (angle == 360){ angle=0;}
+    if (angle2 == 360){ angle2=0;}
+  pushMatrix();
+  translate(width/2,height/2);
+  fill(0);
+  point(0,0);
+  noFill();
+  X1 = int(sin(radians(angle))*100);
+  Y1 = int(cos(radians(angle))*100);
+  X2 = int(sin(radians(angle2))*100);
+  Y2 = int(cos(radians(angle2))*100);
+  
+  fill(255,0,0);
+  line(0,0, X1,Y1);
+  noFill();
+  fill(0,255,0);
+  line(0,0, X2,Y2);
+  noFill();
+  popMatrix();
+  plusProche();
+  angle++;
+  angle2++;
+  delay(80);
+   // direction();
+    
+  
+}
+ 
+    void direction(){
+      maVal = int(angle);
+      for (int c = 0; c <= 7; c++){
+  if(maVal == directionVi[c] ){
+      maVal = directionVa[c];
+    }
+  if((maVal> directionVi[c] )&&(maVal < directionVi[c+1])){
+    
+   // if((maVal> directionVi[c-1] )&&(maVal < directionVi[c+1])){
+     plusProche();
+      pushMatrix();
+      fill(0,0,0);
+      textSize(26);
+      text("entre l'angle "+directionVi[c]+"et l'angle"+directionVi[c-1],360, 380);
+      text("entre l'angle "+directionVa[c]+"et l'angle"+directionVa[c-1],360, 420);
+      text("Direction => "+direcTexte2[d]+" et entre Direction => "+direcTexte[d],360, 480);
+      noFill();
+      popMatrix();
+ // }
+}
+}
+    }
+void plusProche(){
+  moyenne = int(angle);
+  for (int b = 0; b <= 8; b++){  // 8 car 9 variable dans tableau pour détetcé l'approche vers Sud
+    petit = directionVi[b];
+    for (int c = 0; c <=8; c++){
+      grand = directionVi[c];
+      if(((petit < moyenne) && (grand > moyenne))&&(((b-c)==1)||((b-c)==-1))){
+        valGrand = grand;
+        valPetit = petit;
+        if ((moyenne - petit) > (grand - moyenne)){
+          d = c;
+           }
+         if ((moyenne - petit) < (grand - moyenne)){
+          d = b;
+           }
+      }
+      pushMatrix();
+      fill(0,0,0);
+      textSize(26);
+      //text("entre l'angle "+directionVi[b]+"et l'angle"+directionVi[c],360, 380);
+      //text("entre l'angle "+directionVa[b]+"et l'angle"+directionVa[c],360, 420);
+      //text("entre l'angle "+directionVa[b]+"et l'angle"+directionVa[c],360, 460);
+      text("Direction => "+direcTexte[d],360, 500);
+      noFill();
+      popMatrix();
+    }// C
+  }// B
+  pushMatrix();
+      fill(0,0,0);
+      textSize(26);
+      text("Direction => "+direcTexte2[d],360, 540);
+      text("vers  "+directionVi[d],360, 600);
+      text("opposé "+directionVa[d],360, 640);
+      text("angle => "+angle,360, 680);
+      noFill();
+      popMatrix();
+}
